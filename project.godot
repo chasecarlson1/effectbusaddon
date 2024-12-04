@@ -1,0 +1,45 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="EffectBusAddon"
+config/features=PackedStringArray("4.3", "C#", "GL Compatibility")
+
+[display]
+
+window/size/viewport_width=320
+window/size/viewport_height=180
+
+[dotnet]
+
+project/assembly_name="EffectBusAddon"
+
+[editor]
+
+naming/scene_name_casing=1
+naming/script_name_casing=1
+
+[gui]
+
+fonts/dynamic_fonts/use_oversampling=false
+
+[physics]
+
+common/physics_ticks_per_second=30
+common/physics_jitter_fix=0.0
+common/physics_interpolation=true
+common/enable_object_picking=false
+
+[rendering]
+
+textures/canvas_textures/default_texture_filter=0
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
