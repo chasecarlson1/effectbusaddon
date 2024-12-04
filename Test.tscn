@@ -1,3 +1,8 @@
-[gd_scene format=3 uid="uid://77loxu46xd2r"]
+[gd_scene load_steps=2 format=3 uid="uid://77loxu46xd2r"]
+
+[ext_resource type="Script" path="res://addons/effectbus/EffectBus.cs" id="1_cn07l"]
 
 [node name="Test" type="Node2D"]
+
+[node name="EffectBus" type="Node" parent="."]
+script = ExtResource("1_cn07l")
