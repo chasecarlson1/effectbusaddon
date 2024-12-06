@@ -6,6 +6,7 @@
 
 MIT licensed by u/GamingGuitarControlr on Reddit.
 
+
 ## Table of Contents
 1. [Overview](#overview)
 2. [How to Set-Up an `EffectBus` Node](#how-to-set-up-an-effectbus-node)

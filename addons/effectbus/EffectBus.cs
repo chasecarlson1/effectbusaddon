@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Godot;
 
 [GlobalClass]
-[Tool]
 [Icon("res://addons/effectbus/effect_bus_icon.png")]
 public partial class EffectBus : Node
 {
@@ -26,8 +25,8 @@ public partial class EffectBus : Node
             Speed = speed;
         }
     }
-    public static event System.Action<EffectData>? Effect;
-    public static void DoEffect(EffectData data)
+    private static event System.Action<EffectData>? Effect;
+    public static void PlayEffect(EffectData data)
     {
         Effect?.Invoke(data);
     }
@@ -35,9 +34,15 @@ public partial class EffectBus : Node
     {
         private int frameCount;
         private StringName[] animNames;
-        public Instance(SpriteFrames frames)
+        private bool hideOnFinish;
+        public Instance(SpriteFrames frames, bool offsetCentered, Vector2 offset, bool hideOnFinish, bool zIndexRelative, int zIndex)
         {
             SpriteFrames = frames;
+            Offset = offset;
+            Centered = offsetCentered;
+            this.hideOnFinish = hideOnFinish;
+            ZIndex = zIndex;
+            ZAsRelative = zIndexRelative;
             var names = frames.GetAnimationNames();
             animNames = new StringName[names.Length];
             int i = 0;
@@ -49,34 +54,53 @@ public partial class EffectBus : Node
         public override void _Ready()
         {
             base._Ready();
+            if (Engine.IsEditorHint()) return;
             Hide();
             PhysicsInterpolationMode = PhysicsInterpolationModeEnum.Off;
+            if (hideOnFinish)
+            {
+                AnimationFinished += Hide;
+            }
+        }
+        public override void _ExitTree()
+        {
+            base._ExitTree();
+            if (Engine.IsEditorHint()) return;
+            if (hideOnFinish)
+            {
+                AnimationFinished -= Hide;
+            }
         }
         public void Start(Transform2D transform, Color color, float speed)
         {
-            Visible = true;
+            if (Engine.IsEditorHint()) return;
+            Show();
+            if (animNames.Length < 1) return;
+            if (IsPlaying()) Stop();
             GlobalTransform = transform;
             SelfModulate = color;
             SpeedScale = speed;
             Play(animNames[GD.RandRange(0, animNames.Length - 1)], speed);
+            Frame = 0;
         }
     }
     private class Pool
     {
         private readonly Instance[] instances;
         private int index = 0;
-        public Pool(Node root, SpriteFrames frames, int count)
+        public Pool(Node root, SpriteFrames frames, int count, bool hideOnFinish, bool offsetCentered, Vector2 offset, bool zIndexRelative, int zIndex)
         {
             instances = new Instance[count];
             for (int i = 0; i < count; i++)
             {
-                Instance instance = new(frames);
+                Instance instance = new(frames, offsetCentered, offset, hideOnFinish, zIndexRelative, zIndex);
                 instances[i] = instance;
-                root.CallDeferred("add_child", instance);
+                root.CallDeferred(Node.MethodName.AddChild, instance);
             }
         }
         public void Play(Transform2D transform, Color color, float speed)
         {
+            if (Engine.IsEditorHint()) return;
             instances[index].Start(transform, color, speed);
             index = Mathf.PosMod(index + 1, instances.Length);
         }
@@ -86,18 +110,21 @@ public partial class EffectBus : Node
         public const int STEP = 0;
     }
     [Export]
-    private Godot.Collections.Array<SpriteFramesData> Frames = [];
+    private Godot.Collections.Array<SpriteFramesData> SpriteFrameData = [];
 
     private readonly Dictionary<StringName, Pool> pools = [];
     public override void _Ready()
     {
         base._Ready();
+        if (Engine.IsEditorHint()) return;
         var parent = GetParent<Node>();
-        foreach (var data in Frames)
+        foreach (var data in SpriteFrameData)
         {
             var frames = data.Frames;
             if (frames != null)
-                pools.Add(data.Name, new(parent, frames, data.Count));
+                pools.Add(data.Name, new(
+                    parent, frames, data.Count, data.OffsetCentered, data.HideOnFinish, data.Offset, data.ZIndexRelative, data.ZIndex
+                    ));
         }
         Effect += OnEffect;
     }
@@ -109,7 +136,7 @@ public partial class EffectBus : Node
         }
         else
         {
-            GD.PrintErr($"ERROR: trying to play an EffectBus effect of name '{data.Name}' that did not exist in the effect bus' exported variable!");
+            GD.PrintErr($"ERROR: trying to play an EffectBus effect of StringName name '{data.Name}' that did not exist in the effect bus' exported variable!");
         }
     }
 }

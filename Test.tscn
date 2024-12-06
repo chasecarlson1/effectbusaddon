@@ -1,8 +1,32 @@
-[gd_scene load_steps=2 format=3 uid="uid://77loxu46xd2r"]
+[gd_scene load_steps=7 format=3 uid="uid://77loxu46xd2r"]
 
+[ext_resource type="Script" path="res://Test.cs" id="1_0a1o6"]
 [ext_resource type="Script" path="res://addons/effectbus/EffectBus.cs" id="1_cn07l"]
+[ext_resource type="SpriteFrames" uid="uid://cugcc3pfnwq7q" path="res://addons/effectbus/test_sprite_frames.tres" id="2_552qo"]
+[ext_resource type="Script" path="res://addons/effectbus/SpriteFramesData.cs" id="2_auvvi"]
+[ext_resource type="Texture2D" uid="uid://dc3j0ou3reuki" path="res://addons/effectbus/effect_bus_icon.png" id="5_gdoty"]
+
+[sub_resource type="Resource" id="Resource_rybr7"]
+script = ExtResource("2_auvvi")
+Name = &"test"
+Frames = ExtResource("2_552qo")
+Count = 20
+OffsetCentered = true
+Offset = Vector2(0, 0)
+HideOnFinish = true
+ZIndexRelative = true
+ZIndex = 0
 
 [node name="Test" type="Node2D"]
+y_sort_enabled = true
+script = ExtResource("1_0a1o6")
+
+[node name="EffectBusIcon" type="Sprite2D" parent="."]
+position = Vector2(92, 66)
+texture = ExtResource("5_gdoty")
+centered = false
+offset = Vector2(-8, -16)
 
 [node name="EffectBus" type="Node" parent="."]
 script = ExtResource("1_cn07l")
+SpriteFrameData = [SubResource("Resource_rybr7")]

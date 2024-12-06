@@ -11,12 +11,14 @@ config_version=5
 [application]
 
 config/name="EffectBusAddon"
+run/main_scene="res://Test.tscn"
 config/features=PackedStringArray("4.3", "C#", "GL Compatibility")
 
 [display]
 
 window/size/viewport_width=320
 window/size/viewport_height=180
+window/stretch/mode="canvas_items"
 
 [dotnet]
 
