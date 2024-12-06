@@ -1,4 +1,4 @@
-# EffectBus
+# Godot C# EffectBus 2D Addon
 
 [The GitHub Repository](https://github.com/chasecarlson1/effectbusaddon)
 
